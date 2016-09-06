@@ -1,6 +1,7 @@
 package com.example.android.habittracker;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -122,10 +123,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // This will delete all rows when called
-    public void deleteAll() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.delete(HabitContract.HabitEntry.TABLE_NAME, null, null);
-        db.close();
+    public boolean deleteDatabase(Context context) {
+        return context.deleteDatabase(HabitContract.HabitEntry.TABLE_NAME);
 
     }
 
