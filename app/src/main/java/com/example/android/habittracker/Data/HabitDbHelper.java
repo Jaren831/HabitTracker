@@ -32,9 +32,9 @@ public class HabitDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //Create a string that contains the SQL statement to create the pets table.
         String SQL_CREATE_HABITS_TABLE = "CREATE TABLE " + HabitContract.HabitEntry.TABLE_NAME + " ("
-                + HabitContract.HabitEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + HabitContract.HabitEntry._ID + " INTEGER PRIMARY KEY, "
                 + HabitContract.HabitEntry.COLUMN_HABIT_NAME + " TEXT NOT NULL, "
-                + HabitContract.HabitEntry.COLUMN_HABIT_DAY + " TEXT NOT NULL "
+                + HabitContract.HabitEntry.COLUMN_HABIT_DAY + " INTEGER NOT NULL, "
                 + HabitContract.HabitEntry.COLUMN_HABIT_DURATION + " INTEGER NOT NULL DEFAULT 0);";
 
         //Execute the SQL statement.

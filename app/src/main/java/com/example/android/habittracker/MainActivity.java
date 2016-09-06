@@ -5,21 +5,22 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.EditText;
+import android.util.Log;
+import android.widget.TextView;
 
 import com.example.android.habittracker.Data.HabitContract;
 import com.example.android.habittracker.Data.HabitDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText mHabitEditText;
-    private EditText mDurationEditText;
-    private EditText mDayEditText;
 
     private HabitDbHelper mDbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mDbHelper = new HabitDbHelper(this);
+        displayDatabaseInfo();
     }
 
     // Temporary helper method to display informaton in the onscreen textview about
@@ -32,10 +33,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void insertHabit() {
-        String habitString = mHabitEditText.getText().toString().trim();
-        String durationString = mDurationEditText.getText().toString().trim();
-        String dayInteger = mDayEditText.getText().toString().trim();
-
         // Create database helper
         HabitDbHelper mDbHelper = new HabitDbHelper(this);
 
@@ -45,11 +42,12 @@ public class MainActivity extends AppCompatActivity {
         //Create a ContentValues object where the column names are the keys,
         // and habit attributes from the editor are the values.,
         ContentValues values= new ContentValues();
-        values.put(HabitContract.HabitEntry.COLUMN_HABIT_NAME, habitString);
-        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DURATION, durationString);
-        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DAY, durationString);
+        values.put(HabitContract.HabitEntry.COLUMN_HABIT_NAME, "TESt");
+        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DURATION, 100);
+        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DAY, 100);
 
         long newRowId = db.insert(HabitContract.HabitEntry.TABLE_NAME, null, values);
+        Log.v("MainActivity", "New row ID " + newRowId);
     }
 
     private void displayDatabaseInfo() {
@@ -60,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
         String[] project = {
             HabitContract.HabitEntry._ID,
-                HabitContract.HabitEntry.COLUMN_HABIT_NAME,
-                HabitContract.HabitEntry.COLUMN_HABIT_DURATION,
-                HabitContract.HabitEntry.COLUMN_HABIT_DAY
+            HabitContract.HabitEntry.COLUMN_HABIT_NAME,
+            HabitContract.HabitEntry.COLUMN_HABIT_DURATION,
+            HabitContract.HabitEntry.COLUMN_HABIT_DAY
         };
 
         Cursor cursor = db.query(
@@ -73,7 +71,16 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 null,
                 null);
+
+        TextView displayView = (TextView) findViewById(R.id.displayView);
+
         try {
+            displayView.setText("The database contains " + cursor.getCount() + " habits.\n\n");
+            displayView.append(HabitContract.HabitEntry._ID + " - " +
+                    HabitContract.HabitEntry.COLUMN_HABIT_NAME + " - " +
+                    HabitContract.HabitEntry.COLUMN_HABIT_DAY + " - " +
+                    HabitContract.HabitEntry.COLUMN_HABIT_DURATION + "\n\n");
+
             //Figure out the index of each column
             int idColumnIndex = cursor.getColumnIndex(HabitContract.HabitEntry._ID);
             int habitColumnIndex = cursor.getColumnIndex(HabitContract.HabitEntry.COLUMN_HABIT_NAME);
@@ -88,6 +95,10 @@ public class MainActivity extends AppCompatActivity {
                 String currentHabit = cursor.getString(habitColumnIndex);
                 int currentDuration = cursor.getInt(durationColumnIndex);
                 int currentDay = cursor.getInt(dayColumnIndex);
+                displayView.append(currentId + " - " +
+                        currentHabit + " - " +
+                        currentDay + " - " +
+                        currentDuration);
             }
         }
         finally {
@@ -95,4 +106,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void update(String table, ContentValues values, String whereClause, String[] whereArgs) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.update(table, values, whereClause, whereArgs);
+
+    }
+
+    // This will delete all rows when called
+    public void deleteAll() {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.delete(HabitContract.HabitEntry.TABLE_NAME, null, null);
+        db.close();
+
+    }
+
+    //Will delete database when called.
+    public void deleteDb(SQLiteDatabase db) {
+        db = mDbHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + HabitContract.HabitEntry.TABLE_NAME);
+        db.close();
+    }
 }
