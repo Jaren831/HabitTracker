@@ -106,6 +106,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public Cursor getHabit(int id) {
+
+        //Search habit using ID in database.
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + HabitContract.HabitEntry.TABLE_NAME + " where " + HabitContract.HabitEntry._ID + "=" + id  , null);
+        return cursor;
+
+    }
+
     public void update(String table, ContentValues values, String whereClause, String[] whereArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.update(table, values, whereClause, whereArgs);
